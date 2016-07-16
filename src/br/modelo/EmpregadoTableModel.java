@@ -10,6 +10,11 @@ import javax.swing.table.AbstractTableModel;
  */
 public class EmpregadoTableModel extends AbstractTableModel{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8097227158357945L;
+	
 	//constantes p/identificar colunas
 	private final int NOME=0;
 	private final int IDADE=1;

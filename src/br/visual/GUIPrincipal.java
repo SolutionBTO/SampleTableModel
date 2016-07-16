@@ -2,18 +2,20 @@ package br.visual;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
+import br.eventos.JFrameListener;
+import br.eventos.TableAddRowListener;
+import br.eventos.TableAddRowsListener;
+import br.eventos.TableRemoveRowListener;
+import br.eventos.TableRemoveRowsListener;
 import br.modelo.Empregado;
 import br.modelo.EmpregadoTableModel;
 
@@ -22,6 +24,11 @@ import br.modelo.EmpregadoTableModel;
  * @author Roberto Silva
  */
 public class GUIPrincipal extends JFrame{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5859800290315431918L;
 	
 	private JTable table=new JTable();
 	private EmpregadoTableModel tableModel;
@@ -43,7 +50,8 @@ public class GUIPrincipal extends JFrame{
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//centralizando a janela
 		this.setLocationRelativeTo(null);
-
+		//alguns eventos da JFrame
+		this.addWindowListener(new JFrameListener());
 		//neste ponto é criado o modelo da JTable
 		tableModel=new EmpregadoTableModel(getListaEmpregados());
 		
@@ -63,10 +71,10 @@ public class GUIPrincipal extends JFrame{
 		this.add(scrollPane);
 		
 		//add eventos aos botões
-		btnAdd.addActionListener(btnAddListener);
-		btnRem.addActionListener(btnRemListener);
-		btnAddAll.addActionListener(btnAddAllListener);
-		btnRemAll.addActionListener(btnRemAllListener);
+		btnAdd.addActionListener(new TableAddRowListener(this.tableModel));
+		btnRem.addActionListener(new TableRemoveRowListener(this.table));
+		btnAddAll.addActionListener(new TableAddRowsListener(this.tableModel, getListaEmpregados()));
+		btnRemAll.addActionListener(new TableRemoveRowsListener(this.tableModel));
 		
 		//add botões ao JFrame
 		this.add(btnAdd);
@@ -137,48 +145,4 @@ public class GUIPrincipal extends JFrame{
 		
 		return empregados;
 	}
-	
-	/*
-	 * Eventos do botões, poderia ser criado classes que fossem "extends ActionListener"
-	 * mas como se trata de um exemplo, vamos simplificar ;)
-	 * */
-	
-	//evento p/adicionar um registro á tabela
-	private ActionListener btnAddListener=new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			//sorteia um indice do tamanho da lista para baixo
-			//exemplo se a lista tiver o tamanho 10 , então vai de 0 até 9
-			int randomIndex=(int)(Math.random()* (tableModel.getRowCount()-1));
-			Empregado empregado=tableModel.getValue(randomIndex);
-			tableModel.onAdd(empregado);
-		}
-	};
-	
-	//evento p/remover um registro da tabela
-	private ActionListener btnRemListener=new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if(table.getSelectedRow() != -1 && table.getSelectedRow() < tableModel.getRowCount()){
-				tableModel.onRemove(table.getSelectedRow());
-			}else
-				JOptionPane.showMessageDialog(null, "Selecione um registro da tabela!");
-		}
-	};
-	
-	//evento p/adicionar um vários registros á tabela
-	private ActionListener btnAddAllListener=new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			tableModel.onAddAll(getListaEmpregados());
-		}
-	};
-	
-	//evento p/remover vários registros á tabela
-	private ActionListener btnRemAllListener=new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			tableModel.onRemoveAll();
-		}
-	};
 }
